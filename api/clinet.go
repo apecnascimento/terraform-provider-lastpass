@@ -43,20 +43,32 @@ type Client struct {
 }
 
 func (c *Client) login() (*lastpass.Client, error) {
+	var lastpassClient *lastpass.Client
 
-	totp := otpgo.TOTP{
-		Key: c.Totp,
+	if c.Totp != "" {
+
+		totp := otpgo.TOTP{
+			Key: c.Totp,
+		}
+		token, error := totp.Generate()
+		if error != nil {
+			return lastpassClient, error
+		}
+
+		client, error := lastpass.NewClient(context.Background(), c.Username, c.Password, lastpass.WithOneTimePassword(token))
+		if error != nil {
+			return lastpassClient, error
+		}
+		lastpassClient = client
+	} else {
+
+		client, error := lastpass.NewClient(context.Background(), c.Username, c.Password)
+		if error != nil {
+			return lastpassClient, error
+		}
+		lastpassClient = client
+
 	}
 
-	token, error := totp.Generate()
-	if error != nil {
-		return nil, error
-	}
-
-	client, error := lastpass.NewClient(context.Background(), c.Username, c.Password, lastpass.WithOneTimePassword(token))
-	if error != nil {
-		return nil, error
-	}
-
-	return client, nil
+	return lastpassClient, nil
 }
