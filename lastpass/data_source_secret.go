@@ -80,7 +80,7 @@ func DataSourceSecretRead(ctx context.Context, d *schema.ResourceData, m interfa
 	if id != "" {
 
 		if _, err := strconv.Atoi(id); err != nil {
-			err := errors.New("Not a valid Lastpass ID")
+			err := errors.New("not a valid Lastpass ID")
 			return diag.FromErr(err)
 		}
 		secret, err := client.GetByID(id)
