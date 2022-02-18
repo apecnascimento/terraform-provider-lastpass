@@ -3,9 +3,9 @@ package lastpass
 import (
 	"context"
 
-	"github.com/apecnascimento/api"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"gitlab.com/opszak/api"
 )
 
 // Provider is the terraform element of the lastpass provider
@@ -30,7 +30,7 @@ func Provider() *schema.Provider {
 			},
 			"totp": {
 				Type:        schema.TypeString,
-				Required:    false,
+				Required:    true,
 				Description: "Lastpass totp token",
 				DefaultFunc: schema.EnvDefaultFunc("LASTPASS_TOTP", nil),
 			},

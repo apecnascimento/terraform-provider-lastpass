@@ -1,4 +1,4 @@
-module github.com/apecnascimento
+module gitlab.com/opszak
 
 go 1.17
 

@@ -55,14 +55,14 @@ func (c *Client) login() (*lastpass.Client, error) {
 			return lastpassClient, error
 		}
 
-		client, error := lastpass.NewClient(context.Background(), c.Username, c.Password, lastpass.WithOneTimePassword(token))
+		client, error := lastpass.NewClient(context.Background(), c.Username, c.Password, lastpass.WithOneTimePassword(token), lastpass.WithTrust())
 		if error != nil {
 			return lastpassClient, error
 		}
 		lastpassClient = client
 	} else {
 
-		client, error := lastpass.NewClient(context.Background(), c.Username, c.Password)
+		client, error := lastpass.NewClient(context.Background(), c.Username, c.Password, lastpass.WithTrust())
 		if error != nil {
 			return lastpassClient, error
 		}

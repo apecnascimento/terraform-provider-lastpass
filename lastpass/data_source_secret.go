@@ -2,12 +2,10 @@ package lastpass
 
 import (
 	"context"
-	"errors"
-	"strconv"
 
-	"github.com/apecnascimento/api"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"gitlab.com/opszak/api"
 )
 
 // DataSourceSecret describes our lastpass secret data source
@@ -17,11 +15,11 @@ func DataSourceSecret() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"id": {
 				Type:     schema.TypeString,
-				Required: true,
+				Computed: true,
 			},
 			"name": {
 				Type:     schema.TypeString,
-				Computed: true,
+				Required: true,
 			},
 			"username": {
 				Type:     schema.TypeString,
@@ -74,30 +72,23 @@ func DataSourceSecretRead(ctx context.Context, d *schema.ResourceData, m interfa
 	client := m.(*api.Client)
 	var diags diag.Diagnostics
 
-	id := d.Get("id").(string)
 	name := d.Get("name").(string)
 
-	if id != "" {
-
-		if _, err := strconv.Atoi(id); err != nil {
-			err := errors.New("not a valid Lastpass ID")
-			return diag.FromErr(err)
-		}
-		secret, err := client.GetByID(id)
-		if err != nil {
-			return diag.FromErr(err)
-		}
-		fillResourceData(d, secret)
-
-	} else if name != "" {
-		secret, err := client.GetByName(name)
-		if err != nil {
-			return diag.FromErr(err)
-		}
-		fillResourceData(d, secret)
-	} else {
-		d.SetId("")
+	secret, err := client.GetByName(name)
+	if err != nil {
+		return diag.FromErr(err)
 	}
+	// if secret.Password == "" {
+	// 	diags = append(diags, diag.Diagnostic{
+	// 		Severity: diag.Error,
+	// 		Summary:  "Secret not found in your Lastpass account",
+	// 		AttributePath: cty.Path{
+	// 			cty.GetAttrStep{Name: "name"},
+	// 		},
+	// 	})
+	// 	return diags
+	// }
+	fillResourceData(d, secret)
 
 	return diags
 }
